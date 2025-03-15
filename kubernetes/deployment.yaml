@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: interview-be
+  labels:
+    app: interview-be
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: interview-be
+  template:
+    metadata:
+      labels:
+        app: interview-be
+    spec:
+      containers:
+        - name: interview-be
+          image: 6lackcoder/interview-be:1.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          
