@@ -6,6 +6,11 @@ metadata:
     app: interview-fe
 spec:
   replicas: 2
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
   selector:
     matchLabels:
       app: interview-fe
@@ -15,9 +20,37 @@ spec:
         app: interview-fe
     spec:
       containers:
-        - name: interview-be
+        - name: interview-fe
           image: 6lackcoder/interview-fe:1.1
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
-          
+
+          # Liveness and Readiness Probes
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          # Resource Requests and Limits
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+          #  Environment Variables
+          env:
+            - name: NODE_ENV
+              value: production
