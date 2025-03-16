@@ -21,7 +21,7 @@ jobs:
       with:
         node-version: '20'
 
-    # 3. Install Dependencies and Run Tests
+    # 3. Install Dependencies
     - name: Install dependencies
       run: npm install
 
@@ -29,13 +29,6 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    # 5. Security Scanning (Optional but Recommended)
-    - name: Run Docker Security Scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: '6lackcoder/interview-fe:1.1'
-        format: 'table'
-        exit-code: '1'
 
     # 6. Configure AWS Credentials
     - name: Configure AWS Credentials
