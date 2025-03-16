@@ -1,20 +1,31 @@
-# Use Node.js LTS as the base image
-FROM node:20-alpine
-
-# Set working directory
+# Build stage
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy project files
+RUN npm ci
 COPY . .
-
-# Build the Next.js app
 RUN npm run build
+
+# Production stage
+FROM node:20-alpine
+WORKDIR /app
+# Set NODE_ENV
+ENV NODE_ENV production
+
+# Add a non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copy only necessary files from builder
+COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+
+# Set appropriate permissions
+RUN chown -R nextjs:nodejs /app
+USER nextjs
 
 # Expose port 3000
 EXPOSE 3000
