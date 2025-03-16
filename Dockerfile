@@ -21,11 +21,12 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 
-# Copy optional files with proper error handling
-# Use separate RUN commands with conditional checks
+# Create public directory
 RUN mkdir -p ./public
-COPY --from=builder /app/public ./public 2>/dev/null || true
-COPY --from=builder /app/next.config.js ./ 2>/dev/null || true
+
+# Handle optional files with shell script
+RUN if [ -d /builder/app/public ]; then cp -r /builder/app/public/* ./public/; fi && \
+    if [ -f /builder/app/next.config.js ]; then cp /builder/app/next.config.js ./; fi || true
 
 # Set appropriate permissions
 RUN chown -R nextjs:nodejs /app
