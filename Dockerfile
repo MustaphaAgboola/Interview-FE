@@ -10,7 +10,7 @@ RUN npm run build
 FROM node:20-alpine
 WORKDIR /app
 # Set NODE_ENV
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # Add a non-root user
 RUN addgroup --system --gid 1001 nodejs && \
@@ -20,10 +20,12 @@ RUN addgroup --system --gid 1001 nodejs && \
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public 2>/dev/null || :
 
-# Copy next.config.js if it exists
-COPY --from=builder /app/next.config.js ./ 2>/dev/null || :
+# Copy optional files with proper error handling
+# Use separate RUN commands with conditional checks
+RUN mkdir -p ./public
+COPY --from=builder /app/public ./public 2>/dev/null || true
+COPY --from=builder /app/next.config.js ./ 2>/dev/null || true
 
 # Set appropriate permissions
 RUN chown -R nextjs:nodejs /app
