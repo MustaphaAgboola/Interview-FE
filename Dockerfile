@@ -9,8 +9,7 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine
 WORKDIR /app
-# Set NODE_ENV
-ENV NODE_ENV production
+
 
 # Add a non-root user
 RUN addgroup --system --gid 1001 nodejs && \
